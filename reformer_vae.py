@@ -3,7 +3,8 @@ from torch import nn
 from transformers import (
     ReformerEncoder,
     ReformerModel,
-    ReformerConfig
+    ReformerConfig,
+    DataCollatorForLanguageModeling
 )
 
 
@@ -65,3 +66,6 @@ class ReformerVAEConfig(ReformerConfig):
     def __init__(self, set_seq_size, **kwargs):
         super().__init__(**kwargs)
         self.set_seq_size = set_seq_size
+
+
+# TODO: use DataCollatorForLanguageModeling to collate data
