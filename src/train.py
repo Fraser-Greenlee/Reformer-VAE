@@ -37,7 +37,7 @@ from transformers import (
 )
 
 from reformer_vae import (
-    ReformerVAE_Model,
+    ReformerVAE_ModelWithLMHead,
     ReformerVAE_Config,
     NesTokenizer,
 )
@@ -60,6 +60,9 @@ class ModelArguments:
     vocab_file: Optional[str] = field(
         default=None,
         metadata={"help": "A vocab file with one token per line in a text file, used with the NES tokenizer."},
+    )
+    set_seq_size: int = field(
+        default=None, metadata={"help": "Legnth of sequence encoded by the Reformer."}
     )
     ae_latent_size: int = field(
         default=1_000, metadata={"help": "The size of the VAE's latent space."}
@@ -135,6 +138,7 @@ def main():
 
     parser = HfArgumentParser((ModelArguments, DataTrainingArguments, TrainingArguments))
     model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    data_args.block_size = model_args.set_seq_size
 
     if data_args.eval_data_file is None and training_args.do_eval:
         raise ValueError(
@@ -173,10 +177,13 @@ def main():
 
     # Load pretrained model and tokenizer
     tokenizer = NesTokenizer(model_args.vocab_file)
-    config = ReformerVAE_Config(model_args.set_seq_size, model_args.ae_latent_size, vocab_size=len(tokenizer))
+    config = ReformerVAE_Config(
+        model_args.set_seq_size, model_args.ae_latent_size, vocab_size=len(tokenizer),
+        is_decoder=True
+    )
 
     if model_args.model_path:
-        model = ReformerVAE_Model.from_pretrained(
+        model = ReformerVAE_ModelWithLMHead.from_pretrained(
             model_args.model_path,
             from_tf=bool(".ckpt" in model_args.model_path),
             config=config,
@@ -184,7 +191,7 @@ def main():
         )
     else:
         logger.info("Training new ReformerVAE from scratch")
-        model = ReformerVAE_Model.from_config(config)
+        model = ReformerVAE_ModelWithLMHead(config)
 
     model.resize_token_embeddings(len(tokenizer))
 

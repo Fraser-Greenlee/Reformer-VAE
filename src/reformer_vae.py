@@ -72,8 +72,9 @@ class ReformerVAE_Encoder(nn.Module):
         Combines 2 reformer encoders with an MMD-VAE inbetween.
     '''
     def __init__(self, config):
+        super().__init__()
         self.encoder_1 = ReformerEncoder(config)
-        self.vae = MMD_VAE(config.dim_model, config.set_seq_size, config.latent_size)
+        self.vae = MMD_VAE(config.hidden_size, config.set_seq_size, config.latent_size)
         self.encoder_2 = ReformerEncoder(config)
 
     def forward(
