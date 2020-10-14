@@ -37,8 +37,8 @@ from transformers import (
 )
 
 from reformer_vae import (
-    ReformerVAEModel,
-    ReformerVAEConfig,
+    ReformerVAE_Model,
+    ReformerVAE_Config,
     NesTokenizer,
 )
 
@@ -56,6 +56,13 @@ class ModelArguments:
         metadata={
             "help": "The model checkpoint for weights initialization. Leave None if you want to train a model from scratch."
         },
+    )
+    vocab_file: Optional[str] = field(
+        default=None,
+        metadata={"help": "A vocab file with one token per line in a text file, used with the NES tokenizer."},
+    )
+    ae_latent_size: int = field(
+        default=1_000, metadata={"help": "The size of the VAE's latent space."}
     )
     cache_dir: Optional[str] = field(
         default=None, metadata={"help": "Where do you want to store the pretrained models downloaded from s3"}
@@ -165,11 +172,11 @@ def main():
     set_seed(training_args.seed)
 
     # Load pretrained model and tokenizer
-    config = ReformerVAEConfig(model_args.set_seq_size)
-    tokenizer = NesTokenizer(model_args.vocab_path)
+    tokenizer = NesTokenizer(model_args.vocab_file)
+    config = ReformerVAE_Config(model_args.set_seq_size, model_args.ae_latent_size, vocab_size=len(tokenizer))
 
     if model_args.model_path:
-        model = ReformerVAEModel.from_pretrained(
+        model = ReformerVAE_Model.from_pretrained(
             model_args.model_path,
             from_tf=bool(".ckpt" in model_args.model_path),
             config=config,
@@ -177,7 +184,7 @@ def main():
         )
     else:
         logger.info("Training new ReformerVAE from scratch")
-        model = ReformerVAEModel.from_config(config)
+        model = ReformerVAE_Model.from_config(config)
 
     model.resize_token_embeddings(len(tokenizer))
 

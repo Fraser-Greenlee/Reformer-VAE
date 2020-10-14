@@ -1,6 +1,14 @@
 install:
 	pip3 install -r requirements.txt
 
+setup-wandb:
+
+
+train:
+	export WANDB_PROJECT=reformer-vae
+	export WANDB_WATCH=false
+	bash train_reformer.sh
+
 format:
 	black -l 120 *.py
 

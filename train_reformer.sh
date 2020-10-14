@@ -1,0 +1,15 @@
+python3 src/train_refromer_vae.py  \
+    --run_name train  \
+    --output_dir nes_just_language  \
+    --do_train  \
+    --train_data_file data/nes_tx1_full.txt  \
+    --vocab_file data/nes_tx1_vocab.txt  \
+    --per_device_train_batch_size 10  \
+    --gradient_accumulation_steps 5  \
+    --save_total_limit 1  \
+    --save_steps 625  \
+    --num_train_epochs 1  \
+    --logging_steps 10  \
+    --overwrite_output_dir  \
+    --ae_latent_size 1000  \
+    --set_seq_size 300  \

@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from typing import Optional
 import logging
 import torch
 from torch import nn
 from torch.nn import CrossEntropyLoss
-from transformers import (
-    ReformerModelWithLMHead,
+from transformers.modeling_reformer import (
     ReformerEncoder,
+    ReformerModelWithLMHead,
     ReformerConfig,
     ReformerModelWithLMHeadOutput,
     ReformerModelOutput,
@@ -72,7 +73,7 @@ class ReformerVAE_Encoder(nn.Module):
     '''
     def __init__(self, config):
         self.encoder_1 = ReformerEncoder(config)
-        self.vae = MMD_VAE(config.dim_model, config.seq_size, config.latent_size)
+        self.vae = MMD_VAE(config.dim_model, config.set_seq_size, config.latent_size)
         self.encoder_2 = ReformerEncoder(config)
 
     def forward(
@@ -116,7 +117,7 @@ class ReformerVAE_Encoder(nn.Module):
 
 @dataclass
 class ReformerVAE_ModelOutput(ReformerModelOutput):
-    loss: torch.FloatTensor
+    loss: Optional[torch.FloatTensor] = 0
 
 
 class ReformerVAE_Model(AltReformerModel):
@@ -263,10 +264,11 @@ class ReformerVAE_ModelWithLMHead(ReformerModelWithLMHead):
         )
 
 
-class ReformerVAEConfig(ReformerConfig):
-    def __init__(self, set_seq_size, **kwargs):
+class ReformerVAE_Config(ReformerConfig):
+    def __init__(self, set_seq_size, latent_size, **kwargs):
         super().__init__(**kwargs)
         self.set_seq_size = set_seq_size
+        self.latent_size = latent_size
 
 
 class NesTokenizer():
