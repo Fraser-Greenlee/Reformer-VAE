@@ -9,7 +9,7 @@ from transformers import (
 
 class AltReformerModel(ReformerModel):
     '''
-        A slightly refactored ReformerModel
+        Putting initial start method in this class so it doesn't fill up the main one with copy & paste code.
     '''
     def start_forward(
         self,
@@ -94,4 +94,4 @@ class AltReformerModel(ReformerModel):
             start_idx_pos_encodings=start_idx_pos_encodings,
         )
 
-        return embedding_output, orig_sequence_length, input_ids, inputs_embeds, attention_mask
+        return embedding_output, orig_sequence_length, input_ids, inputs_embeds, attention_mask, must_pad_to_match_chunk_length

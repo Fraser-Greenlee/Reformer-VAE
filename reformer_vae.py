@@ -86,7 +86,7 @@ class ReformerVAE_Encoder(nn.Module):
         orig_sequence_length=None,
         output_hidden_states=False,
         output_attentions=False,
-        latent_pred_labels=latent_pred_labels
+        latent_pred_labels=None,
     ):
         reformerEncoderOutput = self.encoder_1(
             hidden_states,
@@ -148,7 +148,7 @@ class ReformerVAE_Model(AltReformerModel):
         )
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
-        embedding_output, head_mask, attention_mask, orig_sequence_length, input_ids, inputs_embeds, attention_mask = self.start_forward(
+        embedding_output, head_mask, attention_mask, orig_sequence_length, input_ids, inputs_embeds, attention_mask, must_pad_to_match_chunk_length = self.start_forward(
             input_ids,
             attention_mask,
             position_ids,
